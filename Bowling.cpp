@@ -228,6 +228,8 @@ BowlingGame::BowlingGame()
     }
     catch(const GameException& e)
     {
+                        cout << "Catched now "<<endl;
+
         std::cerr << e.what() << std::endl;
     }
 

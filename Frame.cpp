@@ -20,10 +20,7 @@ void FrameData::inputValidation(size_t& _pinScore)
     }
     else if(&_pinScore == &mSecondTryPinScore)
     {
-        if(( mFirstTryPinScore + mSecondTryPinScore) > 10 )
-            std::cout << "First Try & Second Try Pin Score Exceeded 10..." << endl;
-
-            std::cout << "Enter a Pin Score For Second Try Between 0 to 10: ";
+        std::cout << "Enter a Pin Score For Second Try Between 0 to " << (10-mFirstTryPinScore) << ": ";
     }
     else if(&_pinScore == &mThirdTryPinScore)
     {
@@ -165,24 +162,54 @@ void FrameData::inputDataValidation(const size_t& currentFrameDataIndex)
 
     cout<<"Frame Number : " << currentFrameDataIndex + 1 << endl;
     //If First Input is 10 then its Strike
-    inputValidation(mFirstTryPinScore);
-    validateInputPinScore();
-    if( mFirstTryPinScore == 10)
-        setStrikeFlag(true);
-    
+    while (mFirstTryPinScore < 10 )
+    {
+        try
+        {
+            inputValidation(mFirstTryPinScore);
+            validateInputPinScore();
+            if( mFirstTryPinScore <= 10)
+            {
+                if(mFirstTryPinScore == 10)
+                    setStrikeFlag(true);
+
+                break;
+            }    
+        }
+        catch(const GameException& e)
+        {
+            std::cerr << e.what() << std::endl;
+            setFirstTryPinScore(0);
+        }
+    }
+
     //If First + Second Input is 10 then its Spare
-    inputValidation(mSecondTryPinScore);
-    validateInputPinScore();
     if( mFirstTryPinScore == 10)
     {
         setStrikeFlag(true);
         setSecondTryPinScore(0);
     }
-    else if( mFirstTryPinScore < 10 && mSecondTryPinScore <= 10 )
+    else if( mFirstTryPinScore < 10 )
     {
-        if( mFirstTryPinScore + mSecondTryPinScore == 10 )
+        while(mFirstTryPinScore + mSecondTryPinScore < 10)
         {
-            setSpareFlag(true);
+            try
+            {
+                inputValidation(mSecondTryPinScore);
+                validateInputPinScore();
+
+                if(mFirstTryPinScore < 10 && mSecondTryPinScore <= 10 )
+                {
+                    if( mFirstTryPinScore + mSecondTryPinScore == 10 )
+                    setSpareFlag(true);
+                    break;
+                }
+            }
+            catch(const GameException& e)
+            {
+                std::cerr << e.what() << std::endl;
+                setSecondTryPinScore(0);
+            }
         }
     }
 
